@@ -2,7 +2,7 @@ import { Component } from "inferno";
 import { NavLink } from "inferno-router";
 import { GetSiteResponse } from "lemmy-js-client";
 import { i18n } from "../../i18next";
-import { docsUrl, joinLemmyUrl, repoUrl } from "../../utils";
+import { docsUrl, repoUrl } from "../../utils";
 import { VERSION } from "../../version";
 
 interface FooterProps {
@@ -56,11 +56,11 @@ export class Footer extends Component<FooterProps, any> {
                 {i18n.t("code")}
               </a>
             </li>
-            <li class="nav-item">
+            {/* <li class="nav-item">
               <a className="nav-link" href={joinLemmyUrl}>
                 {i18n.t("join_lemmy")}
               </a>
-            </li>
+            </li> */}
           </ul>
         </div>
       </nav>

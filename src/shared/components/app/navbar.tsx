@@ -17,7 +17,6 @@ import { i18n } from "../../i18next";
 import { UserService, WebSocketService } from "../../services";
 import {
   authField,
-  donateLemmyUrl,
   getLanguages,
   isBrowser,
   notifyComment,
@@ -301,7 +300,7 @@ export class Navbar extends Component<NavbarProps, NavbarState> {
                   </NavLink>
                 </li>
               )}
-              <li class="nav-item">
+              {/* <li class="nav-item">
                 <a
                   className="nav-link"
                   title={i18n.t("support_lemmy")}
@@ -309,7 +308,7 @@ export class Navbar extends Component<NavbarProps, NavbarState> {
                 >
                   <Icon icon="heart" classes="small" />
                 </a>
-              </li>
+              </li> */}
             </ul>
             <ul class="navbar-nav my-2">
               {this.canAdmin && (
