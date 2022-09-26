@@ -21,7 +21,6 @@ import { UserService, WebSocketService } from "../../services";
 import {
   amAdmin,
   auth,
-  donateLemmyUrl,
   isBrowser,
   notifyComment,
   notifyPrivateMessage,
@@ -156,7 +155,7 @@ export class Navbar extends Component<NavbarProps, NavbarState> {
               >
                 {siteView.site.icon.match({
                   some: icon =>
-                    showAvatars() && <PictrsImage src={icon} icon />,
+                    showAvatars() && <PictrsImage src={icon} siteIcon />,
                   none: <></>,
                 })}
                 {siteView.site.name}
@@ -282,7 +281,7 @@ export class Navbar extends Component<NavbarProps, NavbarState> {
                   </NavLink>
                 </li>
               )}
-              <li class="nav-item">
+              {/* <li class="nav-item">
                 <a
                   className="nav-link"
                   title={i18n.t("support_lemmy")}
@@ -290,7 +289,7 @@ export class Navbar extends Component<NavbarProps, NavbarState> {
                 >
                   <Icon icon="heart" classes="small" />
                 </a>
-              </li>
+              </li> */}
             </ul>
             <ul class="navbar-nav my-2">
               {this.amAdmin && (
