@@ -34,9 +34,15 @@ export class MetadataCard extends Component<
             <div class="row">
               <div class="col-12">
                 <div class="card-body">
+                  {this.twitch && this.twitchVideo}
                   {post.name !== post.embed_title && [
                     <h5 class="card-title d-inline">
-                      <a class="text-body" href={post.url} rel={relTags}>
+                      <a
+                        class="text-body"
+                        href={post.url}
+                        rel={relTags}
+                        target="_blank"
+                      >
                         {post.embed_title}
                       </a>
                     </h5>,
@@ -45,6 +51,7 @@ export class MetadataCard extends Component<
                         class="text-muted font-italic"
                         href={post.url}
                         rel={relTags}
+                        target="_blank"
                       >
                         {new URL(post.url).hostname}
                         <Icon icon="external-link" classes="ml-1" />
@@ -86,5 +93,36 @@ export class MetadataCard extends Component<
   handleIframeExpand(i: MetadataCard) {
     i.state.expanded = !i.state.expanded;
     i.setState(i.state);
+  }
+  get twitch() {
+    let post = this.props.post;
+    return post.url && new URL(post.url).hostname.includes("twitch.tv");
+  }
+
+  get twitchVideo() {
+    let post = this.props.post;
+    let twitchName = new URL(post.url).pathname.slice(1);
+    return (
+      <>
+        <div class="my-2 d-none d-sm-block">
+          <iframe
+            src={`https://player.twitch.tv/?channel=${twitchName}&parent=thisisthe.run&muted=false&autoplay=false`}
+            height="400"
+            width="100%"
+            allowFullScreen
+            title={twitchName}
+          />
+        </div>
+        <div className="my-2 d-block d-sm-none">
+          <iframe
+            src={`https://player.twitch.tv/?channel=${twitchName}&parent=thisisthe.run&muted=false&autoplay=false`}
+            height="400"
+            width="100%"
+            allowFullScreen
+            title={twitchName}
+          />
+        </div>
+      </>
+    );
   }
 }

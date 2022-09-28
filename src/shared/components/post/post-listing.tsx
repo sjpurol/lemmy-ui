@@ -77,6 +77,7 @@ interface PostListingProps {
   duplicates?: PostView[];
   showCommunity?: boolean;
   showBody?: boolean;
+  showExpand?: boolean;
   moderators?: CommunityModeratorView[];
   admins?: PersonViewSafe[];
   enableDownvotes: boolean;
@@ -137,7 +138,9 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
         {!this.state.showEdit ? (
           <>
             {this.listing()}
-            {this.state.imageExpanded && this.img}
+            {this.state.imageExpanded && !this.twitch && this.img}
+            {this.state.imageExpanded && this.twitch && this.twitchVideo}
+            {this.state.imageExpanded && this.youtube && this.youtubeVideo}
             {post.url && this.showBody && post.embed_title && (
               <MetadataCard post={post} />
             )}
@@ -171,6 +174,76 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           />
         )}
       </div>
+    );
+  }
+
+  get youtube() {
+    let post = this.props.post_view.post;
+    return post.url && new URL(post.url).hostname.includes("youtube.com");
+  }
+
+  get youtubeVideo() {
+    const post = this.props.post_view.post;
+    let youtubeID = new URL(post.url).searchParams.get("v");
+    return (
+      <>
+        <div class="offset-sm-3 my-2 d-none d-sm-block">
+          <iframe
+            width="100%"
+            height="400"
+            src={`https://www.youtube.com/embed/${youtubeID}`}
+            title={`YouTube video player - ${youtubeID}`}
+            frameBorder="0"
+            allowFullScreen
+          />
+        </div>
+        <div className="my-2 d-block d-sm-none">
+          <iframe
+            width="100%"
+            height="400"
+            src={`https://www.youtube.com/embed/${youtubeID}`}
+            title={`YouTube video player - ${youtubeID}`}
+            frameBorder="0"
+            allowFullScreen
+          />
+        </div>
+      </>
+    );
+  }
+
+  get twitch() {
+    let post = this.props.post_view.post;
+    return post.url && new URL(post.url).hostname.includes("twitch.tv");
+  }
+
+  get twitchVideo() {
+    const post = this.props.post_view.post;
+    let twitchName = new URL(post.url).pathname.slice(1);
+    // Expected values are `video=videoID` or `channel=channelName`
+    const param = twitchName.includes("videos")
+      ? twitchName.replace("videos", "video").replace("/", "=")
+      : `channel=${twitchName}`;
+    return (
+      <>
+        <div class="offset-sm-3 my-2 d-none d-sm-block">
+          <iframe
+            src={`https://player.twitch.tv/?${param}&parent=thisisthe.run&muted=false&autoplay=true`}
+            height="400"
+            width="100%"
+            allowFullScreen
+            title={twitchName}
+          />
+        </div>
+        <div className="my-2 d-block d-sm-none">
+          <iframe
+            src={`https://player.twitch.tv/?${param}&parent=thisisthe.run&muted=false&autoplay=true`}
+            height="400"
+            width="100%"
+            allowFullScreen
+            title={twitchName}
+          />
+        </div>
+      </>
     );
   }
 
@@ -246,6 +319,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
           href={post.url}
           rel={relTags}
           title={post.url}
+          target="_blank"
         >
           {this.imgThumb(this.imageSrc)}
           <Icon icon="external-link" classes="mini-overlay" />
@@ -273,6 +347,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             href={post.url}
             title={post.url}
             rel={relTags}
+            target="_blank"
           >
             <div class="thumbnail rounded bg-light d-flex justify-content-center">
               <Icon icon="external-link" classes="d-flex align-items-center" />
@@ -336,6 +411,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
                 href={post_view.post.url}
                 title={post_view.post.url}
                 rel={relTags}
+                target="_blank"
               >
                 {hostname(post_view.post.url)}
               </a>
@@ -417,6 +493,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               href={post.url}
               title={post.url}
               rel={relTags}
+              target="_blank"
             >
               {post.name}
             </a>
@@ -429,7 +506,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               {post.name}
             </Link>
           )}
-          {(isImage(post.url) || post.thumbnail_url) && (
+          {(isImage(post.url) || post.thumbnail_url) && this.props.showExpand && (
             <button
               class="btn btn-link text-monospace text-muted small d-inline-block ml-2"
               data-tippy-content={i18n.t("expand_here")}

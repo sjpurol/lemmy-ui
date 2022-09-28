@@ -49,6 +49,7 @@ export class PostListings extends Component<
                 showCommunity={this.props.showCommunity}
                 enableDownvotes={this.props.enableDownvotes}
                 enableNsfw={this.props.enableNsfw}
+                showExpand
               />
               <hr class="my-3" />
             </>

@@ -10,7 +10,7 @@ test_urls=(
   $base_url/login
   $base_url/search
   $base_url/c/announcements
-  $base_url/u/dessalines
+  $base_url/u/lylovir
   $base_url/post/34286
 )
 
