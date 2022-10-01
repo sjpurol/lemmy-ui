@@ -1,3 +1,4 @@
+import { HelixStream } from "@twurple/api/lib";
 import classNames from "classnames";
 import { Component, linkEvent } from "inferno";
 import { Link } from "inferno-router";
@@ -19,6 +20,7 @@ import {
   StickyPost,
   TransferCommunity,
 } from "lemmy-js-client";
+import twitchApi from "../../../shared/twitch";
 import { externalHost } from "../../env";
 import { i18n } from "../../i18next";
 import { BanType } from "../../interfaces";
@@ -70,6 +72,7 @@ interface PostListingState {
   score: number;
   upvotes: number;
   downvotes: number;
+  live: boolean;
 }
 
 interface PostListingProps {
@@ -108,6 +111,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     score: this.props.post_view.counts.score,
     upvotes: this.props.post_view.counts.upvotes,
     downvotes: this.props.post_view.counts.downvotes,
+    live: false,
   };
 
   constructor(props: any, context: any) {
@@ -118,6 +122,13 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     this.handlePostDisLike = this.handlePostDisLike.bind(this);
     this.handleEditPost = this.handleEditPost.bind(this);
     this.handleEditCancel = this.handleEditCancel.bind(this);
+  }
+
+  componentDidMount(): void {
+    if (this.twitch)
+      twitchApi.streams
+        .getStreamByUserName(this.twitchUsername)
+        .then((stream: HelixStream) => this.setState({ live: !!stream }));
   }
 
   componentWillReceiveProps(nextProps: PostListingProps) {
@@ -216,13 +227,16 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
     return post.url && new URL(post.url).hostname.includes("twitch.tv");
   }
 
-  get twitchVideo() {
+  get twitchUsername() {
     const post = this.props.post_view.post;
-    let twitchName = new URL(post.url).pathname.slice(1);
+    return new URL(post.url).pathname.slice(1);
+  }
+
+  get twitchVideo() {
     // Expected values are `video=videoID` or `channel=channelName`
-    const param = twitchName.includes("videos")
-      ? twitchName.replace("videos", "video").replace("/", "=")
-      : `channel=${twitchName}`;
+    const param = this.twitchUsername.includes("videos")
+      ? this.twitchUsername.replace("videos/", "video=")
+      : `channel=${this.twitchUsername}`;
     return (
       <>
         <div class="offset-sm-3 my-2 d-none d-sm-block">
@@ -231,7 +245,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             height="400"
             width="100%"
             allowFullScreen
-            title={twitchName}
+            title={this.twitchUsername}
           />
         </div>
         <div className="my-2 d-block d-sm-none">
@@ -240,11 +254,15 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
             height="400"
             width="100%"
             allowFullScreen
-            title={twitchName}
+            title={this.twitchUsername}
           />
         </div>
       </>
     );
+  }
+
+  get live() {
+    return this.live && "🔴";
   }
 
   get img() {
@@ -495,6 +513,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               rel={relTags}
               target="_blank"
             >
+              {this.live}
               {post.name}
             </a>
           ) : (
@@ -503,6 +522,7 @@ export class PostListing extends Component<PostListingProps, PostListingState> {
               to={`/post/${post.id}`}
               title={i18n.t("comments")}
             >
+              {this.live}
               {post.name}
             </Link>
           )}
